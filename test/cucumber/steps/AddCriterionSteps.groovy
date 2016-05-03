@@ -38,7 +38,7 @@ Feature: Add Criterion
     Then I should see the new criterion available on the criteria list
 */
 
-String criterionName
+Criterion crit
 
 /*
 #Controller Scenario
@@ -48,8 +48,8 @@ When I create the criterion "P1"
 Then the criterion "P1" is properly added to the system
 */
 Given(~'^the criterion with name "([^"]*)" is not on the system$') {
-    String name -> criterionName = Criterions.findByName(name)
-        assert criterionName == null
+    Criterion name -> crit = Criterions.findByName(name)
+        assert crit == null
 }
 
 When(~'^I create the criterion "([^"]*)"$') {
@@ -57,8 +57,7 @@ When(~'^I create the criterion "([^"]*)"$') {
 }
 
 Then(~'^the criterion "([^"]*)" is properly added to the system$') {
-    String name -> criterionName = Criterions.findByName(name)
-        assert CriterionDataAndOperations.compatibleTo(name, criterionName)
+    String name -> assert CriterionDataAndOperations.compatibleTo(name, crit)
 }
 
 /*
@@ -69,15 +68,14 @@ When I create the criterion "P1"
 Then system does nothing
 */
 Given(~'^the criterion named "([^"]*)" already exists on the system$') {
-    String name -> criterionName = Criterions.findByName(name)
-        assert Criterions.findByName(name) == true
+    String name -> assert Criterions.findByName(name) != null
 }
 
 When(~'^I create the criterion "([^"]*)"$') {
     String name -> CriterionDataAndOperations.createCriterion(name)
 }
 
-Then(~'^the system does nothing$') {
+Then(~'^the system does nothing$') { ->
     assert CriterionDataAndOperations.checkIfCriterionsChanged()
 }
 
@@ -95,14 +93,14 @@ Given(~'^I am on the "Add Criterion page"$') {
 }
 
 And(~'^the criterion "([^"]*)" already exists$') {
-    String name -> criterionName = Criterions.findByName(name)
-        assert Criterions.findByName(name) == true
+    String name -> crit = Criterions.findByName(name)
+        assert Criterions.findByName(name) != null
 }
 
 When(~'^I add the criterion "([^"]*)"$') {
     String name ->
         at AddCriterionPage
-        page.add(criterionName)
+        page.add(Criterion.findByName(name))
 }
 
 Then(~'^I should see a message related to the criterion registration failure$') {
